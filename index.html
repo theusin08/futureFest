@@ -379,18 +379,19 @@
             </div>
         </div>
     </section>
+
     <section class="menu" id="Serviços">
-        <div class="container text-center my-5">
+        <div class="container text-center  my-5">
             <h2><span>Alguns dos Nossos Produtos</span></h2>
             <b>Feito pra você<br> Ajudar os nossos animais</b>
         </div>
-
         <div class="container">
             <div class="row" id="produtos-container">
                 <!-- Os produtos cadastrados aparecerão aqui -->
             </div>
         </div>
     </section>
+
 
     <section class="cadastro" id="cadastro">
         <div class="container my-5">
@@ -418,94 +419,70 @@
     </section>
 
     <script>
-document.getElementById('cadastroProduto').addEventListener('submit', async function (event) {
-    event.preventDefault();
+        document.getElementById('cadastroProduto').addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-    const produto = {
-        linkImagem: document.getElementById('linkImagem').value,
-        nome: document.getElementById('nome').value,
-        preco: document.getElementById('preco').value,
-        descricao: document.getElementById('descricao').value
-    };
+            const produto = {
+                linkImagem: document.getElementById('linkImagem').value,
+                nome: document.getElementById('nome').value,
+                preco: document.getElementById('preco').value,
+                descricao: document.getElementById('descricao').value
+            };
 
-    try {
-        const response = await fetch('/produtos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(produto)
+            const response = await fetch('/produtos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(produto)
+            });
+
+            if (response.ok) {
+                alert('Produto cadastrado com sucesso!');
+                carregarProdutos(); // Recarrega a lista de produtos
+            } else {
+                alert('Erro ao cadastrar produto.');
+            }
         });
 
-        if (response.ok) {
-            alert('Produto cadastrado com sucesso!');
-            carregarProdutos(); // Recarrega a lista de produtos
-        } else {
-            const errorText = await response.text();
-            alert('Erro ao cadastrar produto: ' + errorText);
-        }
-    } catch (error) {
-        console.error('Erro na requisição:', error);
-        alert('Erro ao cadastrar produto. Por favor, tente novamente.');
-    }
-});
+        async function carregarProdutos() {
+            const response = await fetch('/produtos');
+            const produtos = await response.json();
+            const container = document.getElementById('produtos-container');
+            container.innerHTML = '';
 
-async function carregarProdutos() {
-    try {
-        const response = await fetch('/produtos');
-        if (!response.ok) {
-            throw new Error('Erro ao buscar produtos');
-        }
-        const produtos = await response.json();
-        const container = document.getElementById('produtos-container');
-        container.innerHTML = '';
-
-        produtos.forEach(produto => {
-            const col = document.createElement('div');
-            col.className = 'col-md-4 mb-4';
-            col.innerHTML = `
-                <div class="card">
-                    <img src="${produto.linkImagem}" class="card-img-top" alt="${produto.nome}">
-                    <div class="card-body">
-                        <h4 class="text-success">${produto.nome}</h4>
-                        <h5>R$${produto.preco}</h5>
-                        <p class="card-text">${produto.descricao}</p>
-                        <button class="btn btn-danger" onclick="excluirProduto('${produto._id}')">Excluir</button>
-
+            produtos.forEach(produto => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-4';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${produto.linkImagem}" class="card-img-top" alt="${produto.nome}">
+                        <div class="card-body">
+                            <h4 class="text-success">${produto.nome}</h4>
+                            <h5>R$${produto.preco}</h5>
+                            <p class="card-text">${produto.descricao}</p>
+                            <button class="btn btn-danger" onclick="excluirProduto('${produto._id}')">Excluir</button>
+                        </div>
                     </div>
-                </div>
-            `;
-            container.appendChild(col);
-        });
-    } catch (error) {
-        console.error('Erro ao carregar produtos:', error);
-        alert('Erro ao carregar produtos. Por favor, tente novamente.');
-    }
-}
-
-async function excluirProduto(id) {
-    console.log('ID do produto a ser excluído:', id); // Para depuração
-    try {
-        const response = await fetch(`/produtos/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            alert('Produto excluído com sucesso!');
-            carregarProdutos(); // Recarrega a lista de produtos
-        } else {
-            const errorText = await response.text();
-            alert('Erro ao excluir produto: ' + errorText);
+                `;
+                container.appendChild(col);
+            });
         }
-    } catch (error) {
-        console.error('Erro na requisição de exclusão:', error);
-        alert('Erro ao excluir produto. Por favor, tente novamente.');
-    }
-}
 
-// Carrega os produtos ao iniciar a página
-window.onload = carregarProdutos;
+        async function excluirProduto(id) {
+            const response = await fetch(`/produtos/${id}`, {
+                method: 'DELETE'
+            });
 
+            if (response.ok) {
+                alert('Produto excluído com sucesso!');
+                carregarProdutos(); // Recarrega a lista de produtos
+            } else {
+                alert('Erro ao excluir produto.');
+            }
+        }
+        // Carrega os produtos ao iniciar a página
+        window.onload = carregarProdutos;
     </script>
 
     <div class="ajuda-nos-container">
@@ -604,17 +581,7 @@ window.onload = carregarProdutos;
     </section>
 
     <!-- Pesquisa de Produtos -->
-    <section class="search" id="search">
-        <div class="main-text">
-            <h2>Pesquisar Produtos</h2>
-        </div>
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Digite o termo de pesquisa...">
-        </div>
-        <div id="search-results">
-            <!-- Aqui serão exibidos os resultados da pesquisa -->
-        </div>
-    </section>
+
 
     <!-- scroll - up -->
     <a href="#home" class="scroll-top">
@@ -705,6 +672,62 @@ window.onload = carregarProdutos;
     });
 </script>
 
+
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 </html>
+
+<!--
+               <section class="search" id="search">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Pesquisar produtos">
+        </div>
+        <div id="search-results">
+           results pesquisa
+        </div>
+    </section> 
+-->
+<!--
+    <script>
+    // Função de pesquisa de produtos
+ async function pesquisarProdutos() {
+     const termo = document.getElementById('search-input').value.toLowerCase();
+     const response = await fetch('/produtos');
+     const produtos = await response.json();
+ 
+     const resultados = produtos.filter(produto =>
+         produto.nome.toLowerCase().includes(termo)
+     );
+ 
+     exibirResultados(resultados);
+ }
+ 
+ // Função para exibir os resultados da pesquisa
+ function exibirResultados(produtos) {
+     const resultadosContainer = document.getElementById('search-results');
+     resultadosContainer.innerHTML = '';
+ 
+     if (produtos.length === 0) {
+         resultadosContainer.innerHTML = '<p>Nenhum produto encontrado.</p>';
+         return;
+     }
+ 
+     produtos.forEach(produto => {
+         const item = document.createElement('div');
+         item.className = 'produto-item';
+         item.innerHTML = `
+             <h4>${produto.nome}</h4>
+             <p>R$ ${produto.preco}</p>
+             <img src="${produto.linkImagem}" alt="${produto.nome}" style="width:100px;">
+             <p>${produto.descricao}</p>
+         `;
+         resultadosContainer.appendChild(item);
+     });
+ }
+ 
+ // Adiciona o evento de escuta para a barra de pesquisa
+ document.getElementById('search-input').addEventListener('input', pesquisarProdutos);
+  
+ </script>
+-->
